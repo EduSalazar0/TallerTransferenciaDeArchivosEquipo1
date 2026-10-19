@@ -1,6 +1,8 @@
 package ec.udla.integracion;
 
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.file.GenericFileOperationFailedException;
 
 /**
  * Ruta de integración por transferencia de archivos (File Transfer).
@@ -15,10 +17,26 @@ public class FileTransferRoute extends RouteBuilder {
 
     @Override
     public void configure() {
+        // Si no se puede escribir en output (p. ej. el archivo está abierto en
+        // Excel), se reintenta 3 veces cada 2 s y luego se descarta el intento.
+        // Sin esto, Camel vuelve a leer el archivo en cada sondeo y entra en bucle.
+        onException(GenericFileOperationFailedException.class)
+            .maximumRedeliveries(3)
+            .redeliveryDelay(2000)
+            .retryAttemptedLogLevel(LoggingLevel.WARN)
+            .handled(true)
+            .log(LoggingLevel.ERROR,
+                "No se pudo escribir ${file:name} en output tras 3 reintentos: "
+                + "${exception.message}. Cierra el archivo y reinicia la aplicación.");
+
         // noop=true: lee el archivo sin borrarlo de input
         from(INPUT + "?noop=true")
             .routeId("ventas-a-inventario")
             .log("Procesando archivo: ${file:name}")
+            // El cuerpo llega como GenericFile; se lee como texto UTF-8 (tildes)
+            .convertBodyTo(String.class, "UTF-8")
+            // Paso 5 del PDF: todo el contenido a mayúsculas
+            .transform().simple("${body.toUpperCase()}")
             .to(OUTPUT);
     }
 }

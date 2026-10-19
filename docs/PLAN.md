@@ -75,7 +75,8 @@ Cada incremento termina con un commit y se sube al repositorio.
 |---|------------|--------------|-----------|
 | 0 | Repositorio y esqueleto Maven | 0, 1, 2 | `pom.xml`, carpetas, datos de ejemplo, plan. Compila. |
 | 1 | Ruta básica input → output | 3, 4 | Copia `ventas.csv` sin cambios y registra el nombre del archivo. |
-| 2 | Transformación | 5 | Primero `toUpperCase` del PDF, luego la transformación enriquecida. |
+| 2a | Transformación del PDF | 5 | `toUpperCase` sobre todo el archivo (incluida la cabecera). |
+| 2b | Transformación enriquecida | 5 | Producto normalizado y columna `total`. |
 | 3 | Ruta extra y filtros | 6 | Filtro `.csv`, segunda ruta que archiva el original en `archived/` con fecha y hora, log con fecha y hora en `logs/`. |
 | 4 | Validación e informe | 7 | Capturas de consola y carpetas, comparación input/output, respuestas a las preguntas de reflexión. |
 
