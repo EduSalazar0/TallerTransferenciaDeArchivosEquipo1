@@ -1,0 +1,22 @@
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Archivos generados por la integración (se conservan solo las carpetas)
+data/input/*
+data/output/*
+data/archived/*
+data/logs/*
+!data/**/.gitkeep
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

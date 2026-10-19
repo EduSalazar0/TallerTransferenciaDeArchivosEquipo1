@@ -1,0 +1,1 @@
+Este archivo no es CSV y debe ser ignorado por el filtro de la ruta.
