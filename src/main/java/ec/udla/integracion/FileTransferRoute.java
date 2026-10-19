@@ -29,14 +29,19 @@ public class FileTransferRoute extends RouteBuilder {
                 "No se pudo escribir ${file:name} en output tras 3 reintentos: "
                 + "${exception.message}. Cierra el archivo y reinicia la aplicación.");
 
+        // Archivo con formato inesperado: no se reintenta (fallaría igual)
+        onException(IllegalArgumentException.class)
+            .handled(true)
+            .log(LoggingLevel.ERROR, "Archivo ${file:name} descartado: ${exception.message}");
+
         // noop=true: lee el archivo sin borrarlo de input
         from(INPUT + "?noop=true")
             .routeId("ventas-a-inventario")
             .log("Procesando archivo: ${file:name}")
             // El cuerpo llega como GenericFile; se lee como texto UTF-8 (tildes)
             .convertBodyTo(String.class, "UTF-8")
-            // Paso 5 del PDF: todo el contenido a mayúsculas
-            .transform().simple("${body.toUpperCase()}")
+            // Producto normalizado, precio_unitario y columna total
+            .process(new VentasTransformer())
             .to(OUTPUT);
     }
 }
